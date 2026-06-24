@@ -12,6 +12,9 @@ out/
 # Personal demo presenter notes
 script.md
 
+# Vercel local project links
+.vercel
+
 # Environment variables
 .env
 .env.local
