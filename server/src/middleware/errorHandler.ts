@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import AppError from '../utils/appError';
+import { ZodError } from 'zod';
 
 interface ErrorWithCode extends Error {
   code?: number;
@@ -32,6 +33,14 @@ const handleValidationErrorDB = (err: ErrorWithCode): AppError => {
     : [];
   const message = `Invalid input data. ${errors.join('. ')}`;
   return new AppError(message, 400);
+};
+
+// Handle Zod validation errors
+const handleZodError = (err: ZodError): AppError => {
+  const message = err.issues
+    .map((issue) => `${issue.path.join('.')}: ${issue.message}`)
+    .join('; ');
+  return new AppError(`Validation failed: ${message}`, 400);
 };
 
 // Development error response
@@ -83,6 +92,7 @@ export const errorHandler = (
     if (err.name === 'CastError') error = handleCastErrorDB(err);
     if (err.code === 11000) error = handleDuplicateFieldsDB(err);
     if (err.name === 'ValidationError') error = handleValidationErrorDB(err);
+    if (err instanceof ZodError || err.name === 'ZodError') error = handleZodError(err);
 
     sendProdError(error, res);
   }

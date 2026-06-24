@@ -1,6 +1,7 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
 export interface IEvent extends Document {
+  trackingId: string;   // identifies which website / client this data belongs to
   session_id: string;
   event_type: 'page_view' | 'click';
   page_url: string;
@@ -11,6 +12,11 @@ export interface IEvent extends Document {
 
 const eventSchema: Schema = new Schema(
   {
+    trackingId: {
+      type: String,
+      required: true,
+      index: true,
+    },
     session_id: {
       type: String,
       required: true,
@@ -46,8 +52,9 @@ const eventSchema: Schema = new Schema(
   }
 );
 
-// Compound indexes
-eventSchema.index({ session_id: 1, timestamp: 1 });
-eventSchema.index({ page_url: 1, event_type: 1 });
+// Compound indexes for efficient queries scoped by trackingId
+eventSchema.index({ trackingId: 1, session_id: 1, timestamp: 1 });
+eventSchema.index({ trackingId: 1, page_url: 1, event_type: 1 });
+eventSchema.index({ trackingId: 1, session_id: 1 });
 
 export default mongoose.model<IEvent>('Event', eventSchema);

@@ -1,14 +1,26 @@
 import express, { Request, Response, NextFunction } from 'express';
 import connectDB from './db';
-import Event from './models/Event';
 import AppError from './utils/appError';
 import { errorHandler } from './middleware/errorHandler';
+import eventRouter from './routes/eventRoutes';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Middleware
 app.use(express.json());
+
+// Enable CORS
+app.use((req: Request, res: Response, next: NextFunction) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  if (req.method === 'OPTIONS') {
+    res.sendStatus(200);
+    return;
+  }
+  next();
+});
 
 // Connect to MongoDB
 connectDB();
@@ -18,27 +30,11 @@ app.get('/health', (req: Request, res: Response) => {
   res.json({ status: 'ok', message: 'Trackker server running' });
 });
 
-// Test endpoint (for development)
-app.post('/api/test-event', async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const event = new Event({
-      session_id: req.body.session_id || `test-session-${Date.now()}`,
-      event_type: req.body.event_type || 'page_view',
-      page_url: req.body.page_url || 'http://localhost/demo',
-      timestamp: new Date(),
-      x: req.body.x ?? null,
-      y: req.body.y ?? null,
-    });
-
-    const savedEvent = await event.save();
-    res.status(201).json({ success: true, data: savedEvent });
-  } catch (err) {
-    next(err);
-  }
-});
+// Mount all event-related routes under /api
+app.use('/api', eventRouter);
 
 // 404 handler for undefined routes
-app.all('*', (req: Request, res: Response, next: NextFunction) => {
+app.use((req: Request, res: Response, next: NextFunction) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
 });
 

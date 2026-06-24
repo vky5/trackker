@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Demo Website - Trackker</title>
+  <style>
+    body { font-family: system-ui; padding: 40px; max-width: 700px; margin: 0 auto; }
+    .site-banner { background: #111; color: white; padding: 12px 20px; margin-bottom: 30px; border-radius: 6px; }
+    button { padding: 12px 24px; font-size: 16px; margin: 8px; cursor: pointer; }
+    .info { background: #f8f9fa; padding: 16px; border-radius: 8px; margin: 20px 0; }
+  </style>
+</head>
+<body>
+  <div class="site-banner">
+    <strong>This is Demo Website A</strong> — trackingId: <code>trk_demoA_9f8k2</code>
+  </div>
+
+  <h1>Welcome to Demo Site A</h1>
+  <p>Click around to generate events. Open DevTools → Console to see what's sent.</p>
+
+  <button id="btn1">Click Me</button>
+  <button id="btn2">Another Button</button>
+  <a href="#" style="display: inline-block; margin: 10px;">Fake Link</a>
+
+  <div class="info">
+    <p><strong>How to use trackingId:</strong></p>
+    <pre>window.__TRACKER_ID = "trk_demoA_9f8k2";</pre>
+    <p>Each website gets its own ID so data stays separated.</p>
+  </div>
+
+  <!-- Set the tracking ID for this website -->
+  <script>
+    window.__TRACKER_ID = "trk_demoA_9f8k2";
+  </script>
+
+  <!-- Load the tracker -->
+  <script src="tracker.js?v=2"></script>
+</body>
+</html>
