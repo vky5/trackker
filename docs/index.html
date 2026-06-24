@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flowdesk — Ship faster with clarity</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --ink: #0f172a;
+      --muted: #64748b;
+      --accent: #4f46e5;
+      --accent-light: #818cf8;
+      --accent-glow: rgba(79, 70, 229, 0.15);
+      --border: #e2e8f0;
+      --success: #10b981;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Tracker badge */
+    .tracker-badge {
+      position: fixed;
+      bottom: 16px;
+      right: 16px;
+      z-index: 100;
+      background: var(--ink);
+      color: #94a3b8;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      padding: 6px 12px;
+      border-radius: 999px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 4px 20px rgba(15, 23, 42, 0.2);
+      font-family: ui-monospace, monospace;
+    }
+    .tracker-badge span { color: #a5b4fc; }
+
+    /* Nav */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-inner {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 800;
+      font-size: 18px;
+      color: var(--ink);
+      text-decoration: none;
+    }
+    .logo-icon {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-light));
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 14px;
+      font-weight: 800;
+    }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+      list-style: none;
+    }
+    .nav-links a {
+      text-decoration: none;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 500;
+      transition: color 0.15s;
+    }
+    .nav-links a:hover { color: var(--ink); }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 20px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+      font-family: inherit;
+      text-decoration: none;
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: white;
+      box-shadow: 0 2px 8px var(--accent-glow);
+    }
+    .btn-primary:hover {
+      background: #4338ca;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 16px rgba(79, 70, 229, 0.3);
+    }
+    .btn-secondary {
+      background: var(--surface);
+      color: var(--ink);
+      border: 1px solid var(--border);
+    }
+    .btn-secondary:hover {
+      border-color: #cbd5e1;
+      background: #f1f5f9;
+    }
+    .btn-ghost {
+      background: transparent;
+      color: var(--muted);
+      padding: 10px 16px;
+    }
+    .btn-ghost:hover { color: var(--ink); background: #f1f5f9; }
+
+    /* Hero */
+    .hero {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 72px 24px 80px;
+      text-align: center;
+      position: relative;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -40px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 600px;
+      height: 400px;
+      background: radial-gradient(ellipse, var(--accent-glow) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #eef2ff;
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 6px 14px;
+      border-radius: 999px;
+      margin-bottom: 24px;
+      border: 1px solid #c7d2fe;
+    }
+    .hero h1 {
+      font-size: clamp(36px, 5vw, 52px);
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+      margin-bottom: 20px;
+      max-width: 700px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .hero h1 em {
+      font-style: normal;
+      background: linear-gradient(135deg, var(--accent), var(--accent-light));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero p {
+      font-size: 18px;
+      color: var(--muted);
+      max-width: 520px;
+      margin: 0 auto 36px;
+    }
+    .hero-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 56px;
+    }
+    .hero-visual {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 20px 60px rgba(15, 23, 42, 0.08);
+      max-width: 720px;
+      margin: 0 auto;
+    }
+    .mock-bar {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 16px;
+    }
+    .mock-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .mock-dot.red { background: #fca5a5; }
+    .mock-dot.yellow { background: #fde68a; }
+    .mock-dot.green { background: #86efac; }
+    .mock-content {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 12px;
+    }
+    .mock-card {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+      text-align: left;
+    }
+    .mock-card .label { font-size: 11px; color: var(--muted); font-weight: 500; margin-bottom: 4px; }
+    .mock-card .value { font-size: 22px; font-weight: 700; color: var(--ink); }
+    .mock-card .delta { font-size: 11px; color: var(--success); font-weight: 600; margin-top: 4px; }
+
+    /* Sections */
+    section { padding: 64px 24px; }
+    .section-inner { max-width: 1080px; margin: 0 auto; }
+    .section-label {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+    .section-title {
+      font-size: 32px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 12px;
+    }
+    .section-desc {
+      color: var(--muted);
+      font-size: 16px;
+      max-width: 480px;
+      margin-bottom: 40px;
+    }
+
+    /* Features */
+    .features { background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+    .feature-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 28px;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      cursor: pointer;
+    }
+    .feature-card:hover {
+      border-color: #c7d2fe;
+      box-shadow: 0 8px 24px var(--accent-glow);
+    }
+    .feature-icon {
+      width: 44px;
+      height: 44px;
+      background: #eef2ff;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      margin-bottom: 16px;
+    }
+    .feature-card h3 { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+    .feature-card p { font-size: 14px; color: var(--muted); line-height: 1.5; }
+
+    /* Pricing */
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+    .pricing-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px;
+      position: relative;
+    }
+    .pricing-card.featured {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px var(--accent), 0 16px 40px var(--accent-glow);
+    }
+    .pricing-card .tag {
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--accent);
+      color: white;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 12px;
+      border-radius: 999px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .plan-name { font-size: 14px; font-weight: 600; color: var(--muted); margin-bottom: 8px; }
+    .plan-price { font-size: 40px; font-weight: 800; letter-spacing: -0.03em; margin-bottom: 4px; }
+    .plan-price span { font-size: 16px; font-weight: 500; color: var(--muted); }
+    .plan-features { list-style: none; margin: 24px 0; }
+    .plan-features li {
+      font-size: 14px;
+      color: var(--muted);
+      padding: 6px 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .plan-features li::before { content: '✓'; color: var(--success); font-weight: 700; }
+
+    /* Stats */
+    .stats {
+      background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
+      color: white;
+    }
+    .stats .section-label { color: #a5b4fc; }
+    .stats .section-title { color: white; }
+    .stats .section-desc { color: #c7d2fe; }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+    }
+    .stat-item { text-align: center; }
+    .stat-value { font-size: 36px; font-weight: 800; letter-spacing: -0.02em; }
+    .stat-label { font-size: 13px; color: #a5b4fc; margin-top: 4px; }
+
+    /* CTA */
+    .cta-section {
+      text-align: center;
+      padding: 80px 24px;
+    }
+    .cta-box {
+      max-width: 640px;
+      margin: 0 auto;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 48px 40px;
+      box-shadow: 0 20px 60px rgba(15, 23, 42, 0.06);
+    }
+    .cta-box h2 { font-size: 28px; font-weight: 800; margin-bottom: 12px; letter-spacing: -0.02em; }
+    .cta-box p { color: var(--muted); margin-bottom: 28px; }
+
+    /* Footer */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 32px 24px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    footer a { color: var(--accent); text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+
+  <div class="tracker-badge">
+    demo_site_a · <span>trk_demoA_9f8k2</span>
+  </div>
+
+  <nav>
+    <div class="nav-inner">
+      <a href="#" class="logo" id="nav-logo">
+        <div class="logo-icon">F</div>
+        Flowdesk
+      </a>
+      <ul class="nav-links">
+        <li><a href="#features" id="nav-features">Features</a></li>
+        <li><a href="#pricing" id="nav-pricing">Pricing</a></li>
+        <li><a href="#stats" id="nav-about">About</a></li>
+      </ul>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-ghost" id="btn-login">Log in</button>
+        <button class="btn btn-primary" id="btn-signup">Start free trial</button>
+      </div>
+    </div>
+  </nav>
+
+  <header class="hero">
+    <div class="hero-badge">✦ Now in public beta</div>
+    <h1>Ship products with <em>clarity</em>, not chaos</h1>
+    <p>Flowdesk unifies your roadmap, sprints, and releases into one calm workspace — so your team moves fast without losing the plot.</p>
+    <div class="hero-actions">
+      <button class="btn btn-primary" id="btn1" style="padding: 14px 28px; font-size: 15px;">Get started free</button>
+      <button class="btn btn-secondary" id="btn2" style="padding: 14px 28px; font-size: 15px;">Watch demo →</button>
+    </div>
+    <div class="hero-visual">
+      <div class="mock-bar">
+        <span class="mock-dot red"></span>
+        <span class="mock-dot yellow"></span>
+        <span class="mock-dot green"></span>
+      </div>
+      <div class="mock-content">
+        <div class="mock-card">
+          <div class="label">Active sprints</div>
+          <div class="value">12</div>
+          <div class="delta">↑ 3 this week</div>
+        </div>
+        <div class="mock-card">
+          <div class="label">Tasks shipped</div>
+          <div class="value">847</div>
+          <div class="delta">↑ 18% vs last month</div>
+        </div>
+        <div class="mock-card">
+          <div class="label">Team velocity</div>
+          <div class="value">94%</div>
+          <div class="delta">On track</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <section class="features" id="features">
+    <div class="section-inner">
+      <div class="section-label">Capabilities</div>
+      <h2 class="section-title">Everything your team needs</h2>
+      <p class="section-desc">From ideation to deployment — one tool, zero context-switching.</p>
+      <div class="feature-grid">
+        <div class="feature-card" id="feature-roadmap">
+          <div class="feature-icon">🗺️</div>
+          <h3>Visual roadmaps</h3>
+          <p>Drag-and-drop planning with dependency tracking and milestone alerts.</p>
+        </div>
+        <div class="feature-card" id="feature-sprints">
+          <div class="feature-icon">⚡</div>
+          <h3>Sprint automation</h3>
+          <p>Auto-assign tasks, estimate velocity, and surface blockers before they stall you.</p>
+        </div>
+        <div class="feature-card" id="feature-analytics">
+          <div class="feature-icon">📊</div>
+          <h3>Delivery analytics</h3>
+          <p>Real-time dashboards on cycle time, throughput, and team health scores.</p>
+        </div>
+        <div class="feature-card" id="feature-integrations">
+          <div class="feature-icon">🔗</div>
+          <h3>50+ integrations</h3>
+          <p>Connect GitHub, Slack, Figma, and your entire toolchain in minutes.</p>
+        </div>
+        <div class="feature-card" id="feature-collab">
+          <div class="feature-icon">👥</div>
+          <h3>Async collaboration</h3>
+          <p>Comments, @mentions, and decision logs — no more lost Slack threads.</p>
+        </div>
+        <div class="feature-card" id="feature-security">
+          <div class="feature-icon">🔒</div>
+          <h3>Enterprise security</h3>
+          <p>SOC 2 Type II, SSO, and granular permissions out of the box.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="stats" id="stats">
+    <div class="section-inner">
+      <div class="section-label">Trusted worldwide</div>
+      <h2 class="section-title">Numbers that speak</h2>
+      <p class="section-desc">Teams at startups and Fortune 500s rely on Flowdesk daily.</p>
+      <div class="stats-grid">
+        <div class="stat-item">
+          <div class="stat-value">4,200+</div>
+          <div class="stat-label">Teams onboarded</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">98%</div>
+          <div class="stat-label">Retention rate</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">2.4M</div>
+          <div class="stat-label">Tasks completed</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">4.9★</div>
+          <div class="stat-label">Average rating</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="pricing">
+    <div class="section-inner">
+      <div class="section-label">Pricing</div>
+      <h2 class="section-title">Simple, transparent plans</h2>
+      <p class="section-desc">Start free. Scale when you're ready. No surprise fees.</p>
+      <div class="pricing-grid">
+        <div class="pricing-card">
+          <div class="plan-name">Starter</div>
+          <div class="plan-price">$0 <span>/mo</span></div>
+          <ul class="plan-features">
+            <li>Up to 5 team members</li>
+            <li>2 active projects</li>
+            <li>Basic analytics</li>
+            <li>Community support</li>
+          </ul>
+          <button class="btn btn-secondary" id="btn-plan-starter" style="width:100%;">Get started</button>
+        </div>
+        <div class="pricing-card featured">
+          <div class="tag">Most popular</div>
+          <div class="plan-name">Pro</div>
+          <div class="plan-price">$29 <span>/mo</span></div>
+          <ul class="plan-features">
+            <li>Unlimited team members</li>
+            <li>Unlimited projects</li>
+            <li>Advanced analytics</li>
+            <li>Priority support</li>
+            <li>Custom integrations</li>
+          </ul>
+          <button class="btn btn-primary" id="btn-plan-pro" style="width:100%;">Start 14-day trial</button>
+        </div>
+        <div class="pricing-card">
+          <div class="plan-name">Enterprise</div>
+          <div class="plan-price">Custom</div>
+          <ul class="plan-features">
+            <li>Everything in Pro</li>
+            <li>SSO & SAML</li>
+            <li>Dedicated CSM</li>
+            <li>SLA guarantee</li>
+            <li>On-premise option</li>
+          </ul>
+          <button class="btn btn-secondary" id="btn-plan-enterprise" style="width:100%;">Contact sales</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta-section">
+    <div class="cta-box">
+      <h2>Ready to ship with clarity?</h2>
+      <p>Join 4,200+ teams already using Flowdesk. Setup takes less than 5 minutes.</p>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+        <button class="btn btn-primary" id="btn-cta-primary" style="padding:14px 32px;">Create free account</button>
+        <a href="#" class="btn btn-ghost" id="link-talk-sales">Talk to sales</a>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p>© 2026 Flowdesk Inc. · <a href="#" id="link-privacy">Privacy</a> · <a href="#" id="link-terms">Terms</a> · <a href="#" id="link-docs">Documentation</a></p>
+  </footer>
+
+  <script>
+    window.__TRACKER_ID = "trk_demoA_9f8k2";
+    window.__TRACKER_ENDPOINT = "https://server-mu-ten-43.vercel.app/api/events";
+  </script>
+  <script src="https://cdn.jsdelivr.net/gh/vky5/trackker@main/tracker.js"></script>
+</body>
+</html>
