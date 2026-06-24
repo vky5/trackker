@@ -22,7 +22,7 @@ export const getClickData = catchAsync(async (req: Request, res: Response) => {
     event_type: 'click'
   })
     .sort({ timestamp: 1 })
-    .select('x y timestamp -_id');
+    .select('x y timestamp element -_id');
 
   res.status(200).json({
     status: 'success',

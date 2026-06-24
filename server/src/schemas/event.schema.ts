@@ -3,11 +3,18 @@ import { z } from 'zod';
 export const createEventSchema = z.object({
   trackingId: z.string().min(3).max(100),
   session_id: z.string().min(10).max(100),
-  event_type: z.enum(['page_view', 'click']),
+  event_type: z.enum(['page_view', 'click', 'scroll']),
   page_url: z.string().min(1),
   timestamp: z.string().or(z.date()).or(z.number()),
   x: z.number().nullable().optional(),
   y: z.number().nullable().optional(),
+  element: z.object({
+    tagName: z.string(),
+    id: z.string().nullable().optional(),
+    className: z.string().nullable().optional(),
+    text: z.string().nullable().optional(),
+    selector: z.string().nullable().optional(),
+  }).nullable().optional(),
 }).strict().refine((data) => {
   if (data.event_type === 'click') {
     return typeof data.x === 'number' && typeof data.y === 'number';

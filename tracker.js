@@ -29,6 +29,11 @@
   }
 
   function sendEvent(eventType, extraData = {}) {
+    // Ignore events generated inside the preview iframe to avoid duplicate/test tracking
+    if (window.parent !== window) {
+      console.log('[Trackker] Running inside iframe (preview mode). Database write skipped.');
+      return;
+    }
     const payload = {
       trackingId: getTrackingId(),
       session_id: getSessionId(),
@@ -121,12 +126,73 @@
     });
   }
 
+  // Generate a unique CSS selector for an element
+  function getCssSelector(el) {
+    if (!(el instanceof Element)) return '';
+    const path = [];
+    while (el && el.nodeType === Node.ELEMENT_NODE) {
+      let selector = el.nodeName.toLowerCase();
+      if (el.id) {
+        selector += '#' + el.id;
+        path.unshift(selector);
+        break; // ID is unique, no need to go further up
+      } else {
+        if (el.className && typeof el.className === 'string') {
+          const classes = el.className.trim().split(/\s+/).filter(Boolean);
+          if (classes.length > 0) {
+            selector += '.' + classes.join('.');
+          }
+        }
+        let sib = el, sibIndex = 1;
+        while (sib = sib.previousElementSibling) {
+          if (sib.nodeName.toLowerCase() === el.nodeName.toLowerCase()) {
+            sibIndex++;
+          }
+        }
+        let hasSiblings = false;
+        let next = el;
+        while (next = next.nextElementSibling) {
+          if (next.nodeName.toLowerCase() === el.nodeName.toLowerCase()) {
+            hasSiblings = true;
+            break;
+          }
+        }
+        if (sibIndex > 1 || hasSiblings) {
+          selector += `:nth-of-type(${sibIndex})`;
+        }
+      }
+      path.unshift(selector);
+      el = el.parentElement;
+    }
+    return path.join(' > ');
+  }
+
   // Track clicks with coordinates relative to the body content (handles centering & scroll)
   function trackClick(e) {
     const rect = document.body.getBoundingClientRect();
     const x = Math.round(e.clientX - rect.left);
     const y = Math.round(e.clientY - rect.top);
-    sendEvent('click', { x, y });
+
+    // Get element info
+    const el = e.target;
+    let elementInfo = null;
+    if (el) {
+      let className = '';
+      if (typeof el.className === 'string') {
+        className = el.className;
+      } else if (el.className && typeof el.className.baseVal === 'string') {
+        className = el.className.baseVal;
+      }
+      elementInfo = {
+        tagName: el.tagName || '',
+        id: el.id || null,
+        className: className || null,
+        text: el.textContent ? el.textContent.trim().substring(0, 100) : null,
+        selector: getCssSelector(el)
+      };
+    }
+
+    sendEvent('click', { x, y, element: elementInfo });
 
     // Notify parent window (dashboard) if we are inside an iframe for real-time painting
     if (window.parent !== window) {
@@ -134,10 +200,33 @@
         type: 'trackker_click',
         x,
         y,
+        element: elementInfo,
+        session_id: getSessionId(),
+        trackingId: getTrackingId(),
         url: window.location.href
       }, '*');
     }
   }
+
+  // Simple debounce helper
+  function debounce(func, wait) {
+    let timeout;
+    return function (...args) {
+      const context = this;
+      clearTimeout(timeout);
+      timeout = setTimeout(() => func.apply(context, args), wait);
+    };
+  }
+
+  // Track scroll position in database (debounced to avoid spamming the server)
+  const trackScrollEvent = debounce(function () {
+    const scrollX = window.scrollX || window.pageXOffset || document.documentElement.scrollLeft;
+    const scrollY = window.scrollY || window.pageYOffset || document.documentElement.scrollTop;
+    sendEvent('scroll', {
+      x: Math.round(scrollX),
+      y: Math.round(scrollY)
+    });
+  }, 1000);
 
   function init() {
     // Clean up legacy/unscoped tracking keys from local storage
@@ -154,10 +243,25 @@
 
     // Listen for scroll events to sync heatmap overlay position in parent dashboard
     window.addEventListener('scroll', sendScroll, { passive: true });
+    window.addEventListener('resize', sendScroll, { passive: true });
     setTimeout(sendScroll, 50);
+
+    // Listen for scroll events to save scroll position to database
+    window.addEventListener('scroll', trackScrollEvent, { passive: true });
 
     // Listen for clicks
     document.addEventListener('click', trackClick, true);
+
+    // Listen for scroll commands from parent dashboard
+    window.addEventListener('message', function (e) {
+      if (e.data && e.data.type === 'trackker_command_scroll') {
+        window.scrollTo({
+          top: e.data.scrollTop || 0,
+          left: e.data.scrollLeft || 0,
+          behavior: 'smooth'
+        });
+      }
+    });
 
     console.log('[Trackker] Initialized with trackingId:', getTrackingId());
   }

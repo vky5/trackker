@@ -1,13 +1,22 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
+export interface IElementInfo {
+  tagName: string;
+  id?: string | null;
+  className?: string | null;
+  text?: string | null;
+  selector?: string | null;
+}
+
 export interface IEvent extends Document {
   trackingId: string;   // identifies which website / client this data belongs to
   session_id: string;
-  event_type: 'page_view' | 'click';
+  event_type: 'page_view' | 'click' | 'scroll';
   page_url: string;
   timestamp: Date;
   x?: number | null;
   y?: number | null;
+  element?: IElementInfo | null;
 }
 
 const eventSchema: Schema = new Schema(
@@ -25,7 +34,7 @@ const eventSchema: Schema = new Schema(
     event_type: {
       type: String,
       required: true,
-      enum: ['page_view', 'click'],
+      enum: ['page_view', 'click', 'scroll'],
       index: true,
     },
     page_url: {
@@ -45,6 +54,13 @@ const eventSchema: Schema = new Schema(
     y: {
       type: Number,
       default: null,
+    },
+    element: {
+      tagName: { type: String, default: null },
+      id: { type: String, default: null },
+      className: { type: String, default: null },
+      text: { type: String, default: null },
+      selector: { type: String, default: null },
     },
   },
   {

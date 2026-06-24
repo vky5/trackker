@@ -15,6 +15,7 @@ export const createEvent = catchAsync(async (req: Request, res: Response) => {
     timestamp: new Date(data.timestamp),
     x: data.x ?? null,
     y: data.y ?? null,
+    element: data.element ?? null,
   });
 
   res.status(201).json({
