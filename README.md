@@ -4,11 +4,36 @@ Trackker is a full-stack user analytics and telemetry platform that captures `pa
 
 This project was built as part of the hiring process for the Full Stack Engineer role at **CausalFunnel**.
 
+**Repository:** [github.com/vky5/trackker](https://github.com/vky5/trackker)
+
 ---
 
-## Live Demo & Ports Architecture
+## Live Demo (Deployed)
 
-To simulate a real analytics system where multiple client sites are tracked independently without cross-site data contamination, the application runs across separate ports:
+| Service | URL | Description |
+|---|---|---|
+| Analytics Dashboard | [dashboard-ten-mu-80.vercel.app/dashboard](https://dashboard-ten-mu-80.vercel.app/dashboard) | Next.js analytics workspace |
+| Product Landing | [dashboard-ten-mu-80.vercel.app](https://dashboard-ten-mu-80.vercel.app) | Install page and integration guide |
+| Telemetry API | [server-mu-ten-43.vercel.app](https://server-mu-ten-43.vercel.app) | Express + MongoDB backend (Vercel serverless) |
+| Demo Site A — **Flowdesk** | [vky5.github.io/trackker](https://vky5.github.io/trackker/) | SaaS landing page (`trk_demoA_9f8k2`) |
+| Demo Site B — **Verdant** | [vky5.github.io/trackker/demoB.html](https://vky5.github.io/trackker/demoB.html) | Plant shop storefront (`trk_demoB_5j2d7`) |
+
+### Try the deployed demo
+
+1. Open [Demo Site A](https://vky5.github.io/trackker/) or [Demo Site B](https://vky5.github.io/trackker/demoB.html) in one browser tab.
+2. Click buttons, scroll the page, and explore to generate events.
+3. Open the [Dashboard](https://dashboard-ten-mu-80.vercel.app/dashboard) in another tab.
+4. Select `demo_site_a` or `demo_site_b` from the scope switcher in the header.
+5. Click a session in the sidebar to view its journey timeline and Event Inspector.
+6. Switch to **Heatmap Analyzer** to see click overlays on the live page preview.
+
+Each demo site is scoped by its own tracking ID, so data from Site A and Site B never mixes.
+
+---
+
+## Local Development
+
+To simulate a real analytics system where multiple client sites are tracked independently without cross-site data contamination, the application runs across separate ports locally:
 
 | Service | URL | Description |
 |---|---|---|
@@ -329,12 +354,12 @@ pnpm install
 pnpm run dev
 ```
 
-### Quick Test Workflow
+### Quick Test Workflow (Local)
 
 1. Start all services (Option 1 or 2)
 2. Open **Demo Site A** or **Demo Site B** in your browser
 3. Click buttons, scroll the page, and navigate around to generate events
-4. Open the **Dashboard** at `http://localhost:3001`
+4. Open the **Dashboard** at [http://localhost:3001](http://localhost:3001)
 5. Select a tracking scope (`demo_site_a` or `demo_site_b`) from the header dropdown
 6. Click a session in the sidebar to view its journey timeline
 7. Click individual events to inspect metadata in the Event Inspector
@@ -349,4 +374,4 @@ pnpm run dev
 2. **Relative coordinates**: Click positions are captured relative to `document.body` so heatmap overlays render correctly in the dashboard iframe regardless of viewport size or scroll offset.
 3. **Polling over WebSockets**: A 5-second silent polling loop keeps the backend REST-compliant and easy to test with standard HTTP tools. WebSockets would be the natural upgrade for production-scale real-time streaming.
 4. **Iframe write suppression**: Events fired inside the dashboard preview iframe are not persisted to the database, preventing preview interactions from polluting real session data.
-5. **Hardcoded API endpoint**: `tracker.js` points to `http://localhost:3000/api/events`. In production this would be configurable via a `data-endpoint` attribute or build-time injection.
+5. **Configurable API endpoint**: `tracker.js` defaults to `http://localhost:3000/api/events` for local dev. Set `window.__TRACKER_ENDPOINT` before loading the script for production (the deployed GitHub Pages demos bundle `docs/tracker.js` and point to the Vercel API).
