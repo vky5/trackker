@@ -4,14 +4,19 @@
  * Usage:
  *   <script>
  *     window.__TRACKER_ID = "trk_yourwebsite_xyz123";
+ *     // optional — defaults to http://localhost:3000/api/events
+ *     window.__TRACKER_ENDPOINT = "https://your-api.example.com/api/events";
  *   </script>
- *   <script src="tracker.js"></script>
+ *   <script src="https://cdn.jsdelivr.net/gh/vky5/trackker@main/tracker.js"></script>
  */
 
 (function () {
   'use strict';
 
-  const ENDPOINT = 'http://localhost:3000/api/events';
+  const ENDPOINT =
+    window.__TRACKER_ENDPOINT ||
+    window.TRACKER_ENDPOINT ||
+    'http://localhost:3000/api/events';
 
   // Get trackingId from global (set by the website owner)
   function getTrackingId() {

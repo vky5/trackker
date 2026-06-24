@@ -32,7 +32,7 @@ To simulate a real analytics system where multiple client sites are tracked inde
 
 `tracker.js` is a zero-dependency script that auto-initializes on page load. Drop it into any website to start collecting telemetry.
 
-### Installation
+### Installation (local)
 
 ```html
 <!-- 1. Set your unique tracking ID -->
@@ -44,7 +44,30 @@ To simulate a real analytics system where multiple client sites are tracked inde
 <script src="tracker.js"></script>
 ```
 
-The tracker also accepts `window.TRACKER_ID` as a fallback. If neither is set, events are tagged with `unknown`.
+### Installation (CDN)
+
+`tracker.js` is served via **jsDelivr** (CDN backed by Cloudflare and other edge networks) directly from this GitHub repo:
+
+```
+https://cdn.jsdelivr.net/gh/vky5/trackker@main/tracker.js
+```
+
+Pin a specific commit for cache stability:
+
+```
+https://cdn.jsdelivr.net/gh/vky5/trackker@<commit-sha>/tracker.js
+```
+
+```html
+<script>
+  window.__TRACKER_ID = "trk_yourwebsite_xyz123";
+  // Required when API is not on localhost:
+  window.__TRACKER_ENDPOINT = "https://your-api.example.com/api/events";
+</script>
+<script src="https://cdn.jsdelivr.net/gh/vky5/trackker@main/tracker.js"></script>
+```
+
+The tracker also accepts `window.TRACKER_ID` as a fallback. If neither tracking ID is set, events are tagged with `unknown`. The API endpoint defaults to `http://localhost:3000/api/events` unless `window.__TRACKER_ENDPOINT` is set.
 
 ### Event Types
 
