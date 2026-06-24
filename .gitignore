@@ -9,6 +9,9 @@ out/
 # Log files
 *.log
 
+# Personal demo presenter notes
+script.md
+
 # Environment variables
 .env
 .env.local
